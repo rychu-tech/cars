@@ -1,7 +1,7 @@
 package com.cars.backend.controller;
 
 import com.cars.backend.dto.CarDto;
-import com.cars.backend.dto.ListRequest;
+import com.cars.backend.dto.request.ListRequest;
 import com.cars.backend.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,6 @@ public class CarController {
 
     @PostMapping
     Page<CarDto> getAllCars(@RequestBody ListRequest request) {
-        System.out.println("JESTEM");
         return carService.getAllCars(request);
     }
 

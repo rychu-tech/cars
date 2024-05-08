@@ -1,4 +1,4 @@
-package com.cars.backend.dto;
+package com.cars.backend.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

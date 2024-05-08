@@ -1,6 +1,6 @@
 package com.cars.backend.service.implementation;
 
-import com.cars.backend.dto.ListRequest;
+import com.cars.backend.dto.request.ListRequest;
 import com.cars.backend.service.PageableService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
