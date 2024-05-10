@@ -1,7 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const Navbar: React.FC = () => {
+  const navigate = useNavigate(); // Initialize navigate function
+
+  const handleLoginClick = () => {
+    navigate('/login'); // Navigate to the login page
+  }
+
   return (
     <nav className="bg-black w-full">
       <div className="flex items-center justify-between mx-auto p-4">
@@ -20,6 +26,7 @@ const Navbar: React.FC = () => {
           </ul>
         </div>
         <button 
+          onClick={handleLoginClick} // Attach the navigate function to onClick event
           type="button" 
           className="text-white hover:bg-blue-800 font-medium rounded-lg text-sm px-4 py-2 text-center bg-blue-600 hover:bg-blue-700">
             Log In

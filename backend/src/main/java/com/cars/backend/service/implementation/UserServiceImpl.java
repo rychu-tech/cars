@@ -10,8 +10,6 @@ import com.cars.backend.enums.UserRole;
 import com.cars.backend.repository.UserRepository;
 import com.cars.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,8 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -85,6 +81,12 @@ public class UserServiceImpl implements UserService {
         }
 
         throw new UsernameNotFoundException("User not found!");
+    }
+
+    @Override
+    public void logout(String accessToken, String refreshToken) {
+        tokenService.invalidateToken(accessToken);
+        tokenService.invalidateToken(refreshToken);
     }
 
 }
