@@ -1,5 +1,6 @@
 package com.cars.backend.service.implementation;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.cars.backend.config.security.TokenProvider;
 import com.cars.backend.dto.UserDto;
@@ -89,4 +90,31 @@ public class UserServiceImpl implements UserService {
         tokenService.invalidateToken(refreshToken);
     }
 
+    @Override
+    public UserDto getUserFromAccessToken(String accessToken, String refreshToken) {
+        try {
+            if (tokenService.isTokenExpired(accessToken)) {
+                throw new TokenExpiredException("Access token has expired!", LocalDateTime.now().toInstant(ZoneOffset.UTC));
+            }
+
+            String username = tokenService.validateToken(accessToken);
+            UserDetails userDetails = userRepository.findByLogin(username);
+
+            if (userDetails != null) {
+                User user = (User) userDetails;
+
+                UserDto userDto = new UserDto();
+                userDto.setId(user.getId());
+                userDto.setRole(user.getRole());
+                userDto.setLogin(user.getUsername());
+                userDto.setAccessToken(accessToken);
+                userDto.setRefreshToken(refreshToken);
+                return userDto;
+            }
+
+            throw new UsernameNotFoundException("User not found with the provided access token.");
+        } catch (JWTVerificationException exception) {
+            throw new UsernameNotFoundException("Invalid access token.", exception);
+        }
+    }
 }

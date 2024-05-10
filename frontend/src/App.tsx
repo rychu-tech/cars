@@ -1,21 +1,37 @@
-
-import './App.css';
+import AppRoutes from './components/AppRoutes';
 import Navbar from './components/Navbar';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import Cars from './pages/Cars';
-import Login from './pages/Login';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { checkUser } from './slices/authSlice';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from './config/store';
+
 function App() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(checkUser());
+  }, [dispatch]);
+
   return (
     <Router>
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div className="flex flex-col h-screen">
         <Navbar />
         <div className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/cars" element={<Cars />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
+          <AppRoutes />
         </div>
       </div>
     </Router>

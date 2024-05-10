@@ -9,4 +9,5 @@ public interface UserService {
     UserDto login(LoginRequest request);
     TokensResponse refreshToken(String refreshToken);
     void logout(String accessToken, String refreshToken);
+    UserDto getUserFromAccessToken(String accessToken, String refreshToken);
 }

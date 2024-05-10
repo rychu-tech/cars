@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class LogoutRequest {
+public class TokenRequest {
     @JsonProperty("refresh_token")
     String refreshToken;
 
