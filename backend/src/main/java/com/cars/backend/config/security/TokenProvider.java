@@ -1,6 +1,7 @@
 package com.cars.backend.config.security;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -14,11 +15,27 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class TokenProvider {
     @Value("${jwt_secret}")
     private String JWT_SECRET;
+    private ConcurrentHashMap<String, LocalDateTime> tokenBlacklist = new ConcurrentHashMap<>();
+
+    public void invalidateToken(String token) {
+        tokenBlacklist.put(token, LocalDateTime.now());
+    }
+
+    public boolean isTokenInvalidated(String token) {
+        LocalDateTime blacklistTimestamp = tokenBlacklist.get(token);
+        if (blacklistTimestamp != null) {
+            DecodedJWT jwt = JWT.decode(token);
+            Instant tokenExpiry = jwt.getExpiresAt().toInstant();
+            return Instant.now().isBefore(tokenExpiry);
+        }
+        return false;
+    }
 
     public String generateAccessToken(UserDetails user) {
         return generateToken(user, 2);
@@ -41,15 +58,17 @@ public class TokenProvider {
         }
     }
 
-    public String validateToken(String token) {
+    public String validateToken(String token) throws TokenExpiredException, JWTVerificationException {
+        if (isTokenInvalidated(token)) {
+            throw new TokenExpiredException("Token is invalidated",  LocalDateTime.now().toInstant(ZoneOffset.UTC));
+        }
         try {
             Algorithm algorithm = Algorithm.HMAC256(JWT_SECRET);
-            JWT.require(algorithm).build().verify(token);
+            JWTVerifier verifier = JWT.require(algorithm).build();
+            verifier.verify(token);
             return JWT.decode(token).getSubject();
-        } catch (TokenExpiredException e) {
-            throw e;
-        } catch (JWTVerificationException exception) {
-            throw new JWTVerificationException("Error while validating token", exception);
+        } catch (JWTVerificationException e) {
+            throw new JWTVerificationException("Error validating token", e);
         }
     }
 

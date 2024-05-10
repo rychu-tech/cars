@@ -3,6 +3,7 @@ package com.cars.backend.controller;
 import com.cars.backend.config.security.TokenProvider;
 import com.cars.backend.dto.UserDto;
 import com.cars.backend.dto.request.LoginRequest;
+import com.cars.backend.dto.request.LogoutRequest;
 import com.cars.backend.dto.request.RefreshTokenRequest;
 import com.cars.backend.entity.User;
 import com.cars.backend.service.UserService;
@@ -38,5 +39,11 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error processing refresh token: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest request) {
+        userService.logout(request.getAccessToken(), request.getRefreshToken());
+        return ResponseEntity.ok().body("Logged out successfully.");
     }
 }

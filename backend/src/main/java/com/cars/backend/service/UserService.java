@@ -8,4 +8,5 @@ public interface UserService {
     void generateAdminUser();
     UserDto login(LoginRequest request);
     TokensResponse refreshToken(String refreshToken);
+    void logout(String accessToken, String refreshToken);
 }
