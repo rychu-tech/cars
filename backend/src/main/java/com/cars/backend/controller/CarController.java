@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "http://127.0.0.1:3000", allowCredentials = "true")
 @RequestMapping(path = "/cars")
 public class CarController {
     @Autowired

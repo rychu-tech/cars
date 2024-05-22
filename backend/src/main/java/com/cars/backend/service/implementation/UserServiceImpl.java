@@ -48,15 +48,11 @@ public class UserServiceImpl implements UserService {
     private void setCookies(HttpServletResponse response, String accessToken, String refreshToken) {
         Cookie tokenCookie = new Cookie("token", accessToken);
         tokenCookie.setMaxAge(2 * 60 * 60);
-        tokenCookie.setSecure(true);
-        tokenCookie.setHttpOnly(true);
-        tokenCookie.setPath("/api/");
+        tokenCookie.setPath("/");
 
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
         refreshCookie.setMaxAge(3 * 24 * 60 * 60);
-        refreshCookie.setSecure(true);
-        refreshCookie.setHttpOnly(true);
-        tokenCookie.setPath("/api/");
+        refreshCookie.setPath("/");
 
         response.addCookie(tokenCookie);
         response.addCookie(refreshCookie);
