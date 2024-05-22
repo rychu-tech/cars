@@ -10,6 +10,8 @@ import com.cars.backend.entity.User;
 import com.cars.backend.enums.UserRole;
 import com.cars.backend.repository.UserRepository;
 import com.cars.backend.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,8 +45,25 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    private void setCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+        Cookie tokenCookie = new Cookie("token", accessToken);
+        tokenCookie.setMaxAge(2 * 60 * 60);
+        tokenCookie.setSecure(true);
+        tokenCookie.setHttpOnly(true);
+        tokenCookie.setPath("/api/");
+
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        refreshCookie.setMaxAge(3 * 24 * 60 * 60);
+        refreshCookie.setSecure(true);
+        refreshCookie.setHttpOnly(true);
+        tokenCookie.setPath("/api/");
+
+        response.addCookie(tokenCookie);
+        response.addCookie(refreshCookie);
+    }
+
     @Override
-    public UserDto login(LoginRequest request) {
+    public UserDto login(LoginRequest request, HttpServletResponse response) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(request.login(), request.password());
         Authentication authUser = authenticationManager.authenticate(usernamePassword);
         User user = (User) authUser.getPrincipal();
@@ -59,11 +78,13 @@ public class UserServiceImpl implements UserService {
         userDto.setAccessToken(accessToken);
         userDto.setRefreshToken(refreshToken);
 
+        setCookies(response, accessToken, refreshToken);
+
         return userDto;
     }
 
     @Override
-    public TokensResponse refreshToken(String refreshToken) throws TokenExpiredException, UsernameNotFoundException {
+    public TokensResponse refreshToken(String refreshToken, HttpServletResponse response) throws TokenExpiredException, UsernameNotFoundException {
         if (tokenService.isTokenExpired(refreshToken)) {
             throw new TokenExpiredException("Refresh token has expired!", LocalDateTime.now().toInstant(ZoneOffset.UTC));
         }
@@ -78,6 +99,9 @@ public class UserServiceImpl implements UserService {
             TokensResponse tokensResponse = new TokensResponse();
             tokensResponse.setAccessToken(newAccessToken);
             tokensResponse.setRefreshToken(newRefreshToken);
+
+            setCookies(response, newAccessToken, newRefreshToken);
+
             return tokensResponse;
         }
 

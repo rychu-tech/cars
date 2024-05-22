@@ -4,7 +4,10 @@ import com.cars.backend.dto.UserDto;
 import com.cars.backend.dto.request.LoginRequest;
 import com.cars.backend.dto.request.TokenRequest;
 import com.cars.backend.dto.request.RefreshTokenRequest;
+import com.cars.backend.dto.response.TokensResponse;
 import com.cars.backend.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +23,14 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public UserDto login(@RequestBody @Validated LoginRequest request) {
-        return userService.login(request);
+    public UserDto login(@RequestBody @Validated LoginRequest request, HttpServletResponse response) {
+        return userService.login(request, response);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<?> refreshAccessToken(@RequestBody RefreshTokenRequest request, HttpServletResponse response) {
         try {
-            return ResponseEntity.ok(userService.refreshToken(request.getRefreshToken()));
+            return ResponseEntity.ok(userService.refreshToken(request.getRefreshToken(), response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error processing refresh token: " + e.getMessage());
         }
