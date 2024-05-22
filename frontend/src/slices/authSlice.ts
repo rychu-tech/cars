@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../config/axiosInstance';
+import Cookies from 'js-cookie';
 
 export interface UserState {
     loading: boolean;
@@ -47,8 +48,8 @@ export const logoutUser = createAsyncThunk(
         try {
             const response = await axiosInstance.post('/auth/logout', 
             { 
-                'access_token': sessionStorage.getItem("accessToken"), 
-                'refresh_token': sessionStorage.getItem("refreshToken") 
+                'access_token': Cookies.get('token'), 
+                'refresh_token': Cookies.get('refreshToken') 
             });
             return response.data;
         } catch (error: any) {
@@ -64,8 +65,8 @@ export const checkUser = createAsyncThunk(
         try {
             const response = await axiosInstance.post('/auth/check', 
             { 
-                'access_token': sessionStorage.getItem("accessToken"), 
-                'refresh_token': sessionStorage.getItem("refreshToken") 
+                'access_token': Cookies.get('token'), 
+                'refresh_token': Cookies.get('refreshToken') 
             });
             return response.data;
         } catch (error: any) {
@@ -89,8 +90,6 @@ const authSlice = createSlice({
             state.id = action.payload.id;
             state.login = action.payload.login;
             state.role = action.payload.role;
-            sessionStorage.setItem("accessToken", action.payload.access_token);
-            sessionStorage.setItem("refreshToken", action.payload.refresh_token);
         })
         .addCase(loginUser.rejected, (state, action) => {
             state.loading = false;
@@ -105,8 +104,6 @@ const authSlice = createSlice({
             state.id = 0;
             state.login = "";
             state.role = "";
-            sessionStorage.removeItem("accessToken");
-            sessionStorage.removeItem("refreshToken");
         })
         .addCase(logoutUser.rejected, (state, action) => {
             state.loading = false;
@@ -125,8 +122,6 @@ const authSlice = createSlice({
         .addCase(checkUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload as string;
-            sessionStorage.removeItem("accessToken");
-            sessionStorage.removeItem("refreshToken");
         });
     },
 });

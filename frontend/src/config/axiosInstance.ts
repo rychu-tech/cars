@@ -1,17 +1,18 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const baseURL = process.env.REACT_APP_API_URL;
 
 const axiosInstance = axios.create({
   baseURL: baseURL,
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(
   config => {
-    const token = sessionStorage.getItem('accessToken');
+    const token = Cookies.get('token');
 
     config.headers['Content-Type'] = 'application/json';
-
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -22,7 +23,6 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
 axiosInstance.interceptors.response.use(
     response => response,
     async (error) => {
@@ -30,25 +30,24 @@ axiosInstance.interceptors.response.use(
       if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
         originalRequest._retry = true;
         try {
-            const res = await axios.post(`${baseURL}/auth/refresh`, 
-            { 
-                'refresh_token': sessionStorage.getItem("refreshToken") 
+            const refreshToken = Cookies.get('refreshToken');
+            if (refreshToken != null) {
+              const res = await axios.post(`${baseURL}/auth/refresh`, 
+                { 
+                  'refresh_token': refreshToken 
+                }
+              );
+              if (res.status === 200) {
+                originalRequest.headers['Authorization'] = `Bearer ${Cookies.get('refreshToken')}`;
+                return axiosInstance(originalRequest);
+              }
             }
-        );
-          if (res.status === 200) {
-            const newAccessToken = res.data.access_token;
-            const newRefreshToken = res.data.refresh_token;
-            sessionStorage.setItem('accessToken', newAccessToken);
-            sessionStorage.setItem('refreshToken', newRefreshToken);
-            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-            return axiosInstance(originalRequest);
-          }
         } catch (refreshError) {
           console.error('Unable to refresh token:', refreshError);
-          await axios.post('/auth/logout', 
+          await axios.post(`${baseURL}/auth/logout`, 
           { 
-              'access_token': sessionStorage.getItem("accessToken"), 
-              'refresh_token': sessionStorage.getItem("refreshToken") 
+              'access_token': Cookies.get('token'),
+              'refresh_token': Cookies.get('refreshToken')
           });
           return Promise.reject(refreshError);
         }

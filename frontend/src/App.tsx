@@ -7,12 +7,15 @@ import { checkUser } from './slices/authSlice';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from './config/store';
+import Cookies from 'js-cookie';
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    dispatch(checkUser());
+    if (Cookies.get('token')) {
+      dispatch(checkUser());
+    }
   }, [dispatch]);
 
   return (

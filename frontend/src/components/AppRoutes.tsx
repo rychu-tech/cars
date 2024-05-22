@@ -13,6 +13,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }): React.ReactElement | null => {
     const isAuthenticated = useSelector((state: RootState) => state.auth.loggedIn);
+    console.log(isAuthenticated);
     return isAuthenticated ? (children as React.ReactElement) : <Navigate to="/login" />;
 };
 
