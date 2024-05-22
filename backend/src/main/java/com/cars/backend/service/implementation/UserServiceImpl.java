@@ -75,8 +75,6 @@ public class UserServiceImpl implements UserService {
         userDto.setId(user.getId());
         userDto.setRole(user.getRole());
         userDto.setLogin(user.getUsername());
-        userDto.setAccessToken(accessToken);
-        userDto.setRefreshToken(refreshToken);
 
         setCookies(response, accessToken, refreshToken);
 
@@ -131,8 +129,6 @@ public class UserServiceImpl implements UserService {
                 userDto.setId(user.getId());
                 userDto.setRole(user.getRole());
                 userDto.setLogin(user.getUsername());
-                userDto.setAccessToken(accessToken);
-                userDto.setRefreshToken(refreshToken);
                 return userDto;
             }
 
