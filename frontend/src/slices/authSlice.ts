@@ -9,16 +9,19 @@ export interface UserState {
     loggedIn: boolean;
     error: string;
     role: string;
-};
-
-const initialUserState: UserState = {
+    initialCheckDone: boolean;
+  };
+  
+  const initialUserState: UserState = {
     loading: false,
     id: 0,
     login: "",
     error: "",
     loggedIn: false,
     role: "",
-};
+    initialCheckDone: false,
+  };
+  
 
 export interface LoginRequest {
     login: string,
@@ -62,19 +65,18 @@ export const logoutUser = createAsyncThunk(
 export const checkUser = createAsyncThunk(
     'auth/check',
     async (_, { rejectWithValue }) => {
-        try {
-            const response = await axiosInstance.post('/auth/check', 
-            { 
-                'access_token': Cookies.get('token'), 
-                'refresh_token': Cookies.get('refreshToken') 
-            });
-            return response.data;
-        } catch (error: any) {
-            console.error(error)
-            return rejectWithValue(error.response.data || error.message);
-        }
+      try {
+        const response = await axiosInstance.post('/auth/check', {
+          'access_token': Cookies.get('token'), 
+          'refresh_token': Cookies.get('refreshToken')
+        });
+        return response.data;
+      } catch (error: any) {
+        console.error(error)
+        return rejectWithValue(error.response.data || error.message);
+      }
     }
-);
+  );
 
 const authSlice = createSlice({
     name: "auth",
@@ -118,11 +120,13 @@ const authSlice = createSlice({
             state.id = action.payload.id;
             state.login = action.payload.login;
             state.role = action.payload.role;
-        })
-        .addCase(checkUser.rejected, (state, action) => {
+            state.initialCheckDone = true;
+          })
+          .addCase(checkUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload as string;
-        });
+            state.initialCheckDone = true;
+          });
     },
 });
 

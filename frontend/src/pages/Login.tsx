@@ -16,6 +16,7 @@ const Login: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const handleLogin = () => {
+        console.log('login');
         if (!login || !password) {
             toast.error("Username and password fields cannot be empty!");
             return; 
@@ -65,7 +66,7 @@ const Login: React.FC = () => {
                         <button 
                             disabled={loading}
                             type="button"
-                            onClick={handleLogin} 
+                            onClick={() => handleLogin()} 
                             className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-900">
                             Login
                         </button>
