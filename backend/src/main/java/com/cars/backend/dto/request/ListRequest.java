@@ -7,12 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ListRequest {
-    @JsonProperty("page_id")
     Integer pageId;
-    @JsonProperty("num_elements")
+    @JsonProperty("numElements")
     Integer numElementsOnPage;
-    @JsonProperty("sort_by")
+    @JsonProperty("sortBy")
     String sortColumnName;
-    @JsonProperty("sort_direction")
     String sortDirection;
 }

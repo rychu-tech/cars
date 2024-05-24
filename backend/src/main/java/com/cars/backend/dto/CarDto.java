@@ -6,13 +6,13 @@ import lombok.Data;
 @Data
 public class CarDto {
     private Long id;
-    @JsonProperty("car_model")
+    @JsonProperty("carModel")
     private CarModelDto carModelDto;
     private Integer year;
     private String color;
     private Integer mileage;
     private Integer price;
-    @JsonProperty("fuel_type")
+    @JsonProperty("fuelType")
     private FuelTypeDto fuelTypeDto;
     private Integer owners;
     private Integer horsepower;
