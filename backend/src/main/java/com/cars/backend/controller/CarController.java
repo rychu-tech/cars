@@ -3,11 +3,19 @@ package com.cars.backend.controller;
 import com.cars.backend.dto.CarDto;
 import com.cars.backend.dto.request.ListRequest;
 import com.cars.backend.service.CarService;
+import com.cars.backend.utils.CarExcelGenerator;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://127.0.0.1:3000", allowCredentials = "true")
@@ -37,6 +45,11 @@ public class CarController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error restoring car: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/excel")
+    public void exportCarsToExcel(HttpServletResponse response) throws IOException {
+        carService.exportCarsToExcel(response);
     }
 
 }

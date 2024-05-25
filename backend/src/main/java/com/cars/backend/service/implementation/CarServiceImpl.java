@@ -6,12 +6,19 @@ import com.cars.backend.entity.Car;
 import com.cars.backend.repository.CarRepository;
 import com.cars.backend.service.CarService;
 import com.cars.backend.service.PageableService;
+import com.cars.backend.utils.CarExcelGenerator;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,7 +32,10 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public Page<CarDto> getAllCars(ListRequest request) {
-        Pageable pageable = pageableService.filterOrderPaginate(request);
+        Pageable pageable = Pageable.unpaged();
+        if(request.getNumElementsOnPage() != 0) {
+            pageable = pageableService.filterOrderPaginate(request);
+        }
         Page<Car> carsFromDb = carRepository.findAll(pageable);
         return carsFromDb.map(Car::convertToDto);
     }
@@ -52,5 +62,26 @@ public class CarServiceImpl implements CarService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void exportCarsToExcel(HttpServletResponse response) throws IOException {
+        response.setContentType("application/octet-stream");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=cars_" + currentDateTime + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+
+        ListRequest request = new ListRequest();
+        request.setPageId(0);
+        request.setSortColumnName("id");
+        request.setSortDirection("asc");
+        request.setNumElementsOnPage(0);
+        Page<CarDto> cars = getAllCars(request);
+        List<CarDto> carsList = cars.getContent();
+        CarExcelGenerator generator = new CarExcelGenerator(carsList);
+        generator.generateExcelFile(response);
     }
 }
