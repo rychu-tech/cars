@@ -15,7 +15,7 @@ public class CarController {
     private CarService carService;
 
     @PostMapping
-    Page<CarDto> getAllCars(@RequestBody ListRe quest request) {
+    Page<CarDto> getAllCars(@RequestBody ListRequest request) {
         return carService.getAllCars(request);
     }
 
