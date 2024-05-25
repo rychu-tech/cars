@@ -47,6 +47,30 @@ export const getCars = createAsyncThunk(
     }
 );
 
+export const deleteCar = createAsyncThunk(
+    'cars/delete',
+    async (carId: number, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.delete(`/cars/${carId}`);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data || error.message);
+        }
+    }
+);
+
+export const restoreCar = createAsyncThunk(
+    'cars/restore',
+    async (carId: number, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.patch(`/cars/${carId}`);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data || error.message);
+        }
+    }
+);
+
 const carSlice = createSlice({
     name: "cars",
     initialState: initialCarState,
@@ -66,6 +90,26 @@ const carSlice = createSlice({
             state.pageSize = action.payload.pageable.pageSize;
         })
         .addCase(getCars.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        })
+        .addCase(deleteCar.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(deleteCar.fulfilled, (state, action) => {
+            state.loading = false;
+        })
+        .addCase(deleteCar.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        })
+        .addCase(restoreCar.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(restoreCar.fulfilled, (state, action) => {
+            state.loading = false;
+        })
+        .addCase(restoreCar.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload as string;
         })

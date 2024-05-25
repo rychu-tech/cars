@@ -48,6 +48,9 @@ public class Car {
     @JoinColumn(name = "transmission_id")
     private Transmission transmission;
 
+    @Column(name="active", columnDefinition = "boolean default true")
+    private Boolean active;
+
     public static CarDto convertToDto(Car car) {
         CarDto carDto = new CarDto();
 
@@ -83,6 +86,7 @@ public class Car {
         fuelTypeDto.setName(car.getFuelType().getName());
 
         carDto.setFuelTypeDto(fuelTypeDto);
+        carDto.setActive(car.getActive());
 
         return carDto;
     }

@@ -20,4 +20,5 @@ public class CarDto {
     private EngineDto engineDto;
     @JsonProperty("transmission")
     private TransmissionDto transmissionDto;
+    private Boolean active;
 }

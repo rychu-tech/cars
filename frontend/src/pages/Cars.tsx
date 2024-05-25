@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Car } from '../models/car';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../config/store';
-import { getCars } from '../slices/carSlice';
+import { deleteCar, getCars, restoreCar } from '../slices/carSlice';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,7 +12,10 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import DownloadIcon from '@mui/icons-material/Download';
-
+import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
+import DeleteCarModal from '../components/DeleteCarModal';
+import RestoreCarModal from '../components/RestoreCarModal';
+import { toast } from 'react-toastify';
 
 const Cars: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -22,6 +25,10 @@ const Cars: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>('id');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [loading, setLoading] = useState<boolean>(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const [restoreModalOpen, setRestoreModalOpen] = useState<boolean>(false);
+  const [carToDelete, setCarToDelete] = useState<Car | null>(null);
+  const [carToRestore, setCarToRestore] = useState<Car | null>(null);
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -64,6 +71,60 @@ const Cars: React.FC = () => {
     return null;
   };
 
+  const handleViewClick = (carId: number) => {
+    console.log(`View details of car with ID: ${carId}`);
+  };
+
+  const handleEditClick = (carId: number) => {
+    console.log(`Edit car with ID: ${carId}`);
+  };
+
+  const handleDeleteClick = (car: Car) => {
+    setCarToDelete(car);
+    setDeleteModalOpen(true);
+  };
+
+  const handleRestoreClick = (car: Car) => {
+    setCarToRestore(car);
+    setRestoreModalOpen(true);
+  };
+
+  const confirmDelete = async (carId: number) => {
+    toast.success("The car was deleted successfully!");
+    await dispatch(deleteCar(carId)).unwrap();
+    setDeleteModalOpen(false);
+    setCarToDelete(null);
+    dispatch(getCars({
+      pageId: page,
+      numElements: pageSize,
+      sortBy: sortBy,
+      sortDirection: sortDirection,
+    }));
+  };
+
+  const cancelDelete = () => {
+    setDeleteModalOpen(false);
+    setCarToDelete(null);
+  };
+
+  const confirmRestore = async (carId: number) => {
+    toast.success("The car was restored successfully!");
+    await dispatch(restoreCar(carId)).unwrap();
+    setRestoreModalOpen(false);
+    setCarToRestore(null);
+    dispatch(getCars({
+      pageId: page,
+      numElements: pageSize,
+      sortBy: sortBy,
+      sortDirection: sortDirection,
+    }));
+  };
+
+  const cancelRestore = () => {
+    setRestoreModalOpen(false);
+    setCarToRestore(null);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="container mx-auto p-2 flex-grow flex flex-col cursor-default">
@@ -76,7 +137,7 @@ const Cars: React.FC = () => {
               <option value={20}>20</option>
             </select>
           </div>
-            <LoadingButton
+          <LoadingButton
             size="large"
             endIcon={<DownloadIcon />}
             loading={loading}
@@ -120,7 +181,7 @@ const Cars: React.FC = () => {
             </thead>
             <tbody>
               {carSlice.cars.map((car: Car) => (
-                <tr key={car.id} className="h-12 hover:bg-gray-100">
+                <tr key={car.id} className={`h-12 hover:bg-gray-100 ${!car.active ? 'hover:bg-red-300 line-through bg-red-200' : ''}`}>
                   <td className="py-2 px-4 border-b text-center">{car.id}</td>
                   <td className="py-2 px-4 border-b text-center">{car.carModel.makeName}</td>
                   <td className="py-2 px-4 border-b text-center">{car.carModel.name}</td>
@@ -131,9 +192,12 @@ const Cars: React.FC = () => {
                   <td className="py-2 px-4 border-b text-center">{car.price}</td>
                   <td className="py-2 px-4 border-b text-center">
                     <div className="flex justify-center items-center space-x-2 cursor-pointer">
-                      <RemoveRedEyeIcon fontSize='small'/>
-                      <EditIcon color="primary" fontSize='small'/>
-                      <DeleteIcon color="error" fontSize='small'/>
+                      <RemoveRedEyeIcon fontSize='small' onClick={() => handleViewClick(car.id)} />
+                      <EditIcon color="primary" fontSize='small' onClick={() => handleEditClick(car.id)} />
+                      {car.active
+                        ? <DeleteIcon color="error" fontSize='small' onClick={() => handleDeleteClick(car)} />
+                        : <RestoreFromTrashIcon color="success" fontSize='small' onClick={() => handleRestoreClick(car)} />
+                      }
                     </div>
                   </td>
                 </tr>
@@ -143,7 +207,7 @@ const Cars: React.FC = () => {
         </div>
       </div>
       <div className="flex justify-center items-center mt-4 sticky bottom-0 bg-white py-2 space-x-4">
-      <LoadingButton
+        <LoadingButton
           size="small"
           onClick={() => handlePageChange(page - 1)}
           startIcon={<NavigateBeforeIcon />}
@@ -165,6 +229,18 @@ const Cars: React.FC = () => {
           Next
         </LoadingButton>
       </div>
+      <DeleteCarModal
+        open={deleteModalOpen}
+        car={carToDelete}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+      />
+      <RestoreCarModal
+        open={restoreModalOpen}
+        car={carToRestore}
+        onClose={cancelRestore}
+        onConfirm={confirmRestore}
+      />
     </div>
   );
 }

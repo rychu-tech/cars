@@ -6,4 +6,7 @@ import org.springframework.data.domain.Page;
 
 public interface CarService {
     Page<CarDto> getAllCars(ListRequest request);
+    Boolean deleteCar(Long carId);
+    Boolean restoreCar(Long carId);
+
 }

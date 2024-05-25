@@ -10,6 +10,7 @@ export interface Car {
     fuelType: FuelType;
     engine: Engine
     transmission: Transmission;
+    active: boolean;
 }
 
 export interface CarModel {
