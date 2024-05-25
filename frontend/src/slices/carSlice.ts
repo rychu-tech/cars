@@ -23,7 +23,7 @@ export interface CarState {
     last: false,
     first: true,
     pageNumber: 0,
-    pageSize: 7,
+    pageSize: 20,
     error: "",
   };
   
