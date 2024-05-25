@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
         </Link>
         {loggedIn ? (
           <>
-            <div className="flex flex-grow justify-center">
+            <div className="flex flex-grow justify-center text-lg">
               <ul className="flex p-0 font-medium border rounded-lg space-x-8 mt-0 border-0 bg-black">
                 <li>
                   <Link
