@@ -16,6 +16,7 @@ import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import DeleteCarModal from '../components/DeleteCarModal';
 import RestoreCarModal from '../components/RestoreCarModal';
 import { toast } from 'react-toastify';
+import ViewCarModal from '../components/ViewCarModal';
 
 const Cars: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -27,8 +28,10 @@ const Cars: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [restoreModalOpen, setRestoreModalOpen] = useState<boolean>(false);
+  const [viewModalOpen, setViewModalOpen] = useState<boolean>(false);
   const [carToDelete, setCarToDelete] = useState<Car | null>(null);
   const [carToRestore, setCarToRestore] = useState<Car | null>(null);
+  const [carToView, setCarToView] = useState<Car | null>(null);
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -71,12 +74,13 @@ const Cars: React.FC = () => {
     return null;
   };
 
-  const handleViewClick = (carId: number) => {
-    console.log(`View details of car with ID: ${carId}`);
+  const handleViewClick = (car: Car) => {
+    setCarToView(car);
+    setViewModalOpen(true);
   };
 
-  const handleEditClick = (carId: number) => {
-    console.log(`Edit car with ID: ${carId}`);
+  const handleEditClick = (car: Car) => {
+    console.log(`Edit car with ID: ${car.id}`);
   };
 
   const handleDeleteClick = (car: Car) => {
@@ -106,6 +110,11 @@ const Cars: React.FC = () => {
     setDeleteModalOpen(false);
     setCarToDelete(null);
   };
+
+  const closeViewClick = () => {
+    setCarToView(null);
+    setViewModalOpen(false);
+  }
 
   const confirmRestore = async (carId: number) => {
     toast.success("The car was restored successfully!");
@@ -192,8 +201,8 @@ const Cars: React.FC = () => {
                   <td className="py-2 px-4 border-b text-center">{car.price}</td>
                   <td className="py-2 px-4 border-b text-center">
                     <div className="flex justify-center items-center space-x-2 cursor-pointer">
-                      <RemoveRedEyeIcon fontSize='small' onClick={() => handleViewClick(car.id)} />
-                      <EditIcon color="primary" fontSize='small' onClick={() => handleEditClick(car.id)} />
+                      <RemoveRedEyeIcon fontSize='small' onClick={() => handleViewClick(car)} />
+                      <EditIcon color="primary" fontSize='small' onClick={() => handleEditClick(car)} />
                       {car.active
                         ? <DeleteIcon color="error" fontSize='small' onClick={() => handleDeleteClick(car)} />
                         : <RestoreFromTrashIcon color="success" fontSize='small' onClick={() => handleRestoreClick(car)} />
@@ -240,6 +249,11 @@ const Cars: React.FC = () => {
         car={carToRestore}
         onClose={cancelRestore}
         onConfirm={confirmRestore}
+      />
+      <ViewCarModal
+        open={viewModalOpen}
+        car={carToView}
+        onClose={closeViewClick}
       />
     </div>
   );
