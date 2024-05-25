@@ -76,6 +76,7 @@ public class CarExcelGenerator {
             createCell(row, columnCount++, car.getCarModelDto().getMakeName(), style);
             createCell(row, columnCount++, car.getCarModelDto().getName(), style);
             createCell(row, columnCount++, car.getColor(), style);
+            createCell(row, columnCount++, car.getEngineDto().getName(), style);
             createCell(row, columnCount++, car.getYear(), style);
             createCell(row, columnCount++, car.getMileage(), style);
             createCell(row, columnCount++, car.getFuelTypeDto().getName(), style);

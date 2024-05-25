@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Car } from '../models/car';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../config/store';
-import { deleteCar, getCars, restoreCar } from '../slices/carSlice';
+import { deleteCar, generateExcelForCars, getCars, restoreCar } from '../slices/carSlice';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -15,8 +16,9 @@ import DownloadIcon from '@mui/icons-material/Download';
 import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import DeleteCarModal from '../components/DeleteCarModal';
 import RestoreCarModal from '../components/RestoreCarModal';
-import { toast } from 'react-toastify';
 import ViewCarModal from '../components/ViewCarModal';
+import { toast } from 'react-toastify';
+import { saveAs } from 'file-saver';
 
 const Cars: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -134,6 +136,22 @@ const Cars: React.FC = () => {
     setCarToRestore(null);
   };
 
+  const downloadExcel = async () => {
+    setLoading(true);
+    try {
+      const action = await dispatch(generateExcelForCars());
+      if (generateExcelForCars.fulfilled.match(action)) {
+        const blob = new Blob([action.payload], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, "cars.xlsx");
+      } else {
+        console.error('Error downloading the file', action.payload);
+      }
+    } catch (error) {
+      console.error('Error downloading the file', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex flex-col h-full">
       <div className="container mx-auto p-2 flex-grow flex flex-col cursor-default">
@@ -153,6 +171,7 @@ const Cars: React.FC = () => {
             loadingPosition="end"
             variant="contained"
             color="secondary"
+            onClick={downloadExcel}
           >
             Download
           </LoadingButton>

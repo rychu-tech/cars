@@ -78,7 +78,7 @@ public class CarServiceImpl implements CarService {
         request.setPageId(0);
         request.setSortColumnName("id");
         request.setSortDirection("asc");
-        request.setNumElementsOnPage(0);
+        request.setNumElementsOnPage(Integer.MAX_VALUE);
         Page<CarDto> cars = getAllCars(request);
         List<CarDto> carsList = cars.getContent();
         CarExcelGenerator generator = new CarExcelGenerator(carsList);
