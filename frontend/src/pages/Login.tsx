@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import { loginUser } from '../slices/authSlice';
 import { AppDispatch, RootState } from '../config/store';
 import { useNavigate } from 'react-router-dom';
+import LoginIcon from '@mui/icons-material/Login';
+import { LoadingButton } from '@mui/lab';
 
 const Login: React.FC = () => {
     const [login, setLogin] = useState<string>("");
@@ -63,13 +65,16 @@ const Login: React.FC = () => {
                         />
                     </div>
                     <div className="flex justify-center mt-4">
-                        <button 
-                            disabled={loading}
-                            type="button"
-                            onClick={() => handleLogin()} 
-                            className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-900">
+                        <LoadingButton
+                            size="large"
+                            onClick={() => handleLogin()}
+                            endIcon={<LoginIcon />}
+                            loading={loading}
+                            loadingPosition="end"
+                            variant="contained"
+                            >
                             Login
-                        </button>
+                        </LoadingButton>
                     </div>
                 </form>
             </div>

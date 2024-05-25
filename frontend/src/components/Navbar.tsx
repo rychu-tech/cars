@@ -5,6 +5,9 @@ import { AppDispatch, RootState } from '../config/store';
 import { logoutUser } from '../slices/authSlice';
 import { toast } from 'react-toastify';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { LoadingButton } from '@mui/lab';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -71,22 +74,28 @@ const Navbar: React.FC = () => {
                 </div>
               )}
             </div>
-            <button
-              onClick={handleLogout}
-              type="button"
-              className="text-white hover:bg-blue-800 font-medium rounded-lg text-sm px-4 py-2 text-center bg-blue-600 hover:bg-blue-700"
-            >
-              Log Out
-            </button>
+              <LoadingButton
+                size="medium"
+                onClick={handleLogout}
+                endIcon={<LogoutIcon />}
+                loading={false}
+                loadingPosition="end"
+                variant="contained"
+                >
+                Logout
+              </LoadingButton>
           </>
         ) : (
-          <button
-            onClick={handleLogin}
-            type="button"
-            className="text-white hover:bg-blue-800 font-medium rounded-lg text-sm px-4 py-2 text-center bg-blue-600 hover:bg-blue-700"
-          >
-            Log In
-          </button>
+          <LoadingButton
+             size="medium"
+             onClick={handleLogin}
+             endIcon={<LoginIcon />}
+             loading={false}
+             loadingPosition="end"
+             variant="contained"
+             >
+             Login
+          </LoadingButton>
         )}
       </div>
     </nav>

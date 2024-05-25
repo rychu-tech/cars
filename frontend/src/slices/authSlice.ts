@@ -67,10 +67,11 @@ export const checkUser = createAsyncThunk(
     async (_, { rejectWithValue }) => {
       try {
         const response = await axiosInstance.post('/auth/check', {
-          'access_token': Cookies.get('token'), 
-          'refresh_token': Cookies.get('refreshToken')
-        });
-        return response.data;
+            'access_token': Cookies.get('token') ?? '', 
+            'refresh_token': Cookies.get('refreshToken') ?? ''
+          });
+          return response.data;
+
       } catch (error: any) {
         console.error(error)
         return rejectWithValue(error.response.data || error.message);

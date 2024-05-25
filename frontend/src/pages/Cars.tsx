@@ -148,7 +148,7 @@ const Cars: React.FC = () => {
           onClick={() => handlePageChange(page - 1)}
           startIcon={<NavigateBeforeIcon />}
           loading={loading}
-          loadingPosition="end"
+          loadingPosition="start"
           variant="contained"
         >
           Back

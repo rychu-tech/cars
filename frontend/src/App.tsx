@@ -15,6 +15,7 @@ function App() {
 
   useEffect(() => {
     dispatch(checkUser());
+    
   }, [dispatch]);
 
   if (!initialCheckDone) {
