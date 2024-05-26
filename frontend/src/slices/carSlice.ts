@@ -59,6 +59,21 @@ export const deleteCar = createAsyncThunk(
     }
 );
 
+export const generateExcelForCars = createAsyncThunk(
+    'cars/excel',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.get(`/cars/excel`, {
+                responseType: 'blob', 
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data || error.message);
+        }
+    }
+);
+
+
 export const restoreCar = createAsyncThunk(
     'cars/restore',
     async (carId: number, { rejectWithValue }) => {
@@ -110,6 +125,16 @@ const carSlice = createSlice({
             state.loading = false;
         })
         .addCase(restoreCar.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        })
+        .addCase(generateExcelForCars.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(generateExcelForCars.fulfilled, (state, action) => {
+            state.loading = false;
+        })
+        .addCase(generateExcelForCars.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload as string;
         })
