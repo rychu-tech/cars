@@ -1,5 +1,7 @@
 package com.cars.backend.entity;
 
+import com.cars.backend.dto.EngineDto;
+import com.cars.backend.dto.FuelTypeDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,4 +17,11 @@ public class FuelType {
 
     @Column(name = "name", length = 100, nullable = false, unique = true)
     private String name;
+
+    public static FuelTypeDto convertToDto(FuelType fuelType) {
+        FuelTypeDto fuelTypeDto = new FuelTypeDto();
+        fuelTypeDto.setId(fuelType.getId());
+        fuelTypeDto.setName(fuelType.getName());
+        return fuelTypeDto;
+    }
 }
