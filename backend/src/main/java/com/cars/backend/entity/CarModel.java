@@ -1,5 +1,6 @@
 package com.cars.backend.entity;
 
+import com.cars.backend.dto.CarModelDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,4 +19,13 @@ public class CarModel {
     @ManyToOne
     @JoinColumn(name = "car_make_id")
     private CarMake carMake;
+
+    public static CarModelDto convertToDto(CarModel carModel) {
+        CarModelDto dto = new CarModelDto();
+        dto.setId(carModel.getId());
+        dto.setName(carModel.getName());
+        dto.setMakeName(carModel.getCarMake().getName());
+        dto.setMakeId(carModel.getCarMake().getId());
+        return dto;
+    }
 }

@@ -1,5 +1,6 @@
 package com.cars.backend.entity;
 
+import com.cars.backend.dto.CarMakeDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,4 +17,10 @@ public class CarMake {
     @Column(name = "name", length = 100, nullable = false, unique = true)
     private String name;
 
+    public static CarMakeDto convertToDto(CarMake carMake) {
+        CarMakeDto dto = new CarMakeDto();
+        dto.setId(carMake.getId());
+        dto.setName(carMake.getName());
+        return dto;
+    }
 }
