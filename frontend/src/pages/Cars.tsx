@@ -7,6 +7,7 @@ import { deleteCar, generateExcelForCars, getCars, restoreCar } from '../slices/
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -19,6 +20,8 @@ import RestoreCarModal from '../components/RestoreCarModal';
 import ViewCarModal from '../components/ViewCarModal';
 import { toast } from 'react-toastify';
 import { saveAs } from 'file-saver';
+import { Button } from '@mui/material';
+import AddNewCarModal from '../components/AddNewCarModal';
 
 const Cars: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,6 +33,7 @@ const Cars: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [restoreModalOpen, setRestoreModalOpen] = useState<boolean>(false);
+  const [addNewCarModalOpen, setAddNewCarModalOpen] = useState<boolean>(false);
   const [viewModalOpen, setViewModalOpen] = useState<boolean>(false);
   const [carToDelete, setCarToDelete] = useState<Car | null>(null);
   const [carToRestore, setCarToRestore] = useState<Car | null>(null);
@@ -81,6 +85,10 @@ const Cars: React.FC = () => {
     setViewModalOpen(true);
   };
 
+  const handleAddClick = () => {
+    setAddNewCarModalOpen(true);
+  }
+
   const handleEditClick = (car: Car) => {
     console.log(`Edit car with ID: ${car.id}`);
   };
@@ -112,6 +120,10 @@ const Cars: React.FC = () => {
     setDeleteModalOpen(false);
     setCarToDelete(null);
   };
+
+  const cancelAdd = () => {
+    setAddNewCarModalOpen(false);
+  }
 
   const closeViewClick = () => {
     setCarToView(null);
@@ -164,17 +176,26 @@ const Cars: React.FC = () => {
               <option value={20}>20</option>
             </select>
           </div>
+          <Button 
+            variant="contained"
+            color="success"
+            onClick={() => handleAddClick()}
+          >
+            <AddIcon /> 
+            Add New Car
+          </Button>
           <LoadingButton
             size="large"
-            endIcon={<DownloadIcon />}
+            startIcon={<DownloadIcon />}
             loading={loading}
-            loadingPosition="end"
+            loadingPosition="start"
             variant="contained"
             color="secondary"
             onClick={downloadExcel}
           >
             Download
           </LoadingButton>
+          
         </div>
         <div className="flex-grow overflow-auto">
           <table className="table-fixed w-full bg-white border border-gray-200">
@@ -274,6 +295,11 @@ const Cars: React.FC = () => {
         car={carToView}
         onClose={closeViewClick}
       />
+      <AddNewCarModal
+        open={addNewCarModalOpen}
+        onClose={cancelAdd}
+      />
+
     </div>
   );
 }
