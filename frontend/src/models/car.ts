@@ -34,3 +34,8 @@ export interface Transmission {
     id: number;
     name: string;
 }
+
+export interface CarMake {
+    id: number;
+    name: string;
+}

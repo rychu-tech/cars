@@ -182,7 +182,7 @@ const Cars: React.FC = () => {
             onClick={() => handleAddClick()}
           >
             <AddIcon /> 
-            Add New Car
+            New Car
           </Button>
           <LoadingButton
             size="large"

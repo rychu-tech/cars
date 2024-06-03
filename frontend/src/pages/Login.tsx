@@ -18,7 +18,6 @@ const Login: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const handleLogin = () => {
-        console.log('login');
         if (!login || !password) {
             toast.error("Username and password fields cannot be empty!");
             return; 
