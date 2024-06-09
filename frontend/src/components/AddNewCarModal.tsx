@@ -10,12 +10,19 @@ import {
   validateMileage,
   validateOwners,
   validateHorsepower,
-  validatePrice
+  validatePrice,
 } from '../utils/validationHelper';
-import { Car, CarMake } from '../models/car';
+import { Car } from '../models/car';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../config/store';
-import { createCar, getCarMakes, getCarModelsForMake } from '../slices/carSlice';
+import {
+  createCar,
+  getCarMakes,
+  getCarModelsForMake,
+  getEngines,
+  getFuelTypes,
+  getTransmissions,
+} from '../slices/carSlice';
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { toast } from 'react-toastify';
 
@@ -36,7 +43,7 @@ const initialCar: Car = {
   fuelType: { id: 0, name: '' },
   engine: { id: 0, name: '' },
   transmission: { id: 0, name: '' },
-  active: true
+  active: true,
 };
 
 const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
@@ -49,64 +56,113 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
     mileage: '',
     owners: '',
     horsepower: '',
-    price: ''
+    price: '',
   });
 
-  const fetchCarMakes = async () => {
+  const fetchData = async () => {
     await dispatch(getCarMakes());
-  };
-
-  const fetchCarModelsForMake = async () => {
-    await dispatch(getCarModelsForMake(car.carModel.makeId));
+    await dispatch(getEngines());
+    await dispatch(getFuelTypes());
+    await dispatch(getTransmissions());
   };
 
   useEffect(() => {
-    fetchCarMakes();
-  }, []);
+    fetchData();
+  }, [dispatch]);
 
   useEffect(() => {
     if (carState.carMakes.length > 0) {
-      setCar({
-        ...car,
+      setCar((prevCar) => ({
+        ...prevCar,
         carModel: {
-          ...car.carModel,
+          ...prevCar.carModel,
           makeId: carState.carMakes[0].id,
           makeName: carState.carMakes[0].name,
-        }
-      });
+        },
+      }));
     }
   }, [carState.carMakes]);
 
   useEffect(() => {
     if (carState.carModels.length > 0) {
-      setCar({
-        ...car,
+      setCar((prevCar) => ({
+        ...prevCar,
         carModel: {
-          ...car.carModel,
+          ...prevCar.carModel,
           id: carState.carModels[0].id,
           name: carState.carModels[0].name,
-        }
-      });
+        },
+      }));
     }
   }, [carState.carModels]);
 
   useEffect(() => {
+    if (carState.transmissions.length > 0) {
+      setCar((prevCar) => ({
+        ...prevCar,
+        transmission: {
+          id: carState.transmissions[0].id,
+          name: carState.transmissions[0].name,
+        },
+      }));
+    }
+  }, [carState.transmissions]);
+
+  useEffect(() => {
+    if (carState.fuelTypes.length > 0) {
+      setCar((prevCar) => ({
+        ...prevCar,
+        fuelType: {
+          id: carState.fuelTypes[0].id,
+          name: carState.fuelTypes[0].name,
+        },
+      }));
+    }
+  }, [carState.fuelTypes]);
+
+  useEffect(() => {
+    if (carState.engines.length > 0) {
+      setCar((prevCar) => ({
+        ...prevCar,
+        engine: {
+          id: carState.engines[0].id,
+          name: carState.engines[0].name,
+        },
+      }));
+    }
+  }, [carState.engines]);
+
+  useEffect(() => {
     if (car.carModel.makeId !== 0) {
-      fetchCarModelsForMake();
+      dispatch(getCarModelsForMake(car.carModel.makeId));
     }
-  }, [car.carModel.makeId]);
+  }, [car.carModel.makeId, dispatch]);
 
-  const handleSelectCarMakeChange = (event: SelectChangeEvent<number>, child: ReactNode) => {
-    const selectedMake = carState.carMakes.find(model => model.id === event.target.value);
-    if (selectedMake) {
-      setCar((prev) => ({ ...prev, carModel: { id: 0, name: '', makeId: selectedMake.id, makeName: selectedMake.name } }));
-    }
-  };
+  type CarStateKey = 'carMakes' | 'carModels' | 'engines' | 'fuelTypes' | 'transmissions';
 
-  const handleSelectCarModelChange = (event: SelectChangeEvent<number>, child: ReactNode) => {
-    const selectedModel = carState.carModels.find(model => model.id === event.target.value);
-    if (selectedModel) {
-      setCar((prev) => ({ ...prev, carModel: { ...prev.carModel, id: selectedModel.id, name: selectedModel.name } }));
+  const handleSelectChange = (
+    event: SelectChangeEvent<number>,
+    field: keyof Car,
+    key: CarStateKey
+  ) => {
+    const value = event.target.value as number;
+    const selectedItem = carState[key].find((item: any) => item.id === value);
+    
+    
+    if (selectedItem) {
+      if (key === 'carMakes') {
+        setCar((prev) => ({
+          ...prev,
+          [field]: { makeId: selectedItem.id, makeName: selectedItem.name },
+        }));
+      } else {
+        setCar((prev) => ({
+          ...prev,
+          [field]: { id: selectedItem.id, name: selectedItem.name },
+        }));
+      }
+
+      
     }
   };
 
@@ -120,14 +176,13 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
       validateHorsepower(car, setErrors) &&
       validatePrice(car, setErrors);
     if (isValid) {
-      dispatch(createCar(car))
-      .then((result) => {
-          if (result.meta.requestStatus === 'fulfilled') {
-              toast.success("Successfully added car!");
-              onClose();
-          } else {
-              toast.error("Please check form values!");
-          }
+      dispatch(createCar(car)).then((result) => {
+        if (result.meta.requestStatus === 'fulfilled') {
+          toast.success('Successfully added car!');
+          onClose();
+        } else {
+          toast.error('Please check form values!');
+        }
       });
     }
   };
@@ -145,7 +200,9 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
       aria-labelledby="new-car-modal-title"
       aria-describedby="new-car-modal-description"
     >
-      <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded shadow-lg">
+      <Box
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded shadow-lg"
+      >
         <Typography id="new-car-modal-title" variant="h6" component="h2">
           New Car
         </Typography>
@@ -155,17 +212,17 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
           flexDirection="column"
           gap={2}
           onSubmit={handleSubmit}
-          className='mt-10'
+          className="mt-10"
         >
           <Box display="flex" gap={2}>
             <Box flex={1} display="flex" flexDirection="column" gap={2}>
-              <FormControl required size='small'>
+              <FormControl required size="small">
                 <InputLabel id="car-make-select-label">Make</InputLabel>
                 <Select
                   id="car-make-select"
                   labelId="car-make-select-label"
-                  value={car.carModel.makeId !== 0 ? car.carModel.makeId : carState.carMakes[0]?.id}
-                  onChange={handleSelectCarMakeChange}
+                  value={car.carModel.makeId || carState.carMakes[0]?.id}
+                  onChange={(e) => handleSelectChange(e, 'carModel', 'carMakes')}
                   label="Make"
                 >
                   {carState.carMakes.map((make) => (
@@ -175,13 +232,13 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
                   ))}
                 </Select>
               </FormControl>
-              <FormControl required size='small'>
+              <FormControl required size="small">
                 <InputLabel id="car-model-select-label">Model</InputLabel>
                 <Select
                   id="car-model-select"
                   labelId="car-model-select-label"
-                  value={car.carModel.id !== 0 ? car.carModel.id : carState.carModels[0]?.id}
-                  onChange={handleSelectCarModelChange}
+                  value={car.carModel.id || carState.carModels[0]?.id}
+                  onChange={(e) => handleSelectChange(e, 'carModel', 'carModels')}
                   label="Model"
                 >
                   {carState.carModels.map((model) => (
@@ -202,7 +259,7 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
                 error={!!errors.year}
                 helperText={errors.year}
                 required
-                size='small'
+                size="small"
               />
               <TextField
                 id="color"
@@ -214,7 +271,7 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
                 error={!!errors.color}
                 helperText={errors.color}
                 required
-                size='small'
+                size="small"
               />
             </Box>
             <Box flex={1} display="flex" flexDirection="column" gap={2}>
@@ -229,7 +286,7 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
                 error={!!errors.mileage}
                 helperText={errors.mileage}
                 required
-                size='small'
+                size="small"
               />
               <TextField
                 id="owners"
@@ -242,7 +299,7 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
                 error={!!errors.owners}
                 helperText={errors.owners}
                 required
-                size='small'
+                size="small"
               />
               <TextField
                 id="horsepower"
@@ -255,7 +312,7 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
                 error={!!errors.horsepower}
                 helperText={errors.horsepower}
                 required
-                size='small'
+                size="small"
               />
               <TextField
                 id="price"
@@ -268,10 +325,58 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
                 error={!!errors.price}
                 helperText={errors.price}
                 required
-                size='small'
+                size="small"
               />
             </Box>
           </Box>
+          <FormControl required size="small">
+            <InputLabel id="fuel-type-select-label">Fuel Type</InputLabel>
+            <Select
+              id="fuel-type-select"
+              labelId="fuel-type-select-label"
+              value={car.fuelType.id || carState.fuelTypes[0]?.id}
+              onChange={(e) => handleSelectChange(e, 'fuelType', 'fuelTypes')}
+              label="Fuel Type"
+            >
+              {carState.fuelTypes.map((fuelType) => (
+                <MenuItem key={fuelType.id} value={fuelType.id}>
+                  {fuelType.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl required size="small">
+            <InputLabel id="engine-select-label">Engine</InputLabel>
+            <Select
+              id="engine-select"
+              labelId="engine-select-label"
+              value={car.engine.id || carState.engines[0]?.id}
+              onChange={(e) => handleSelectChange(e, 'engine', 'engines')}
+              label="Engine"
+            >
+              {carState.engines.map((engine) => (
+                <MenuItem key={engine.id} value={engine.id}>
+                  {engine.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl required size="small">
+            <InputLabel id="transmission-select-label">Transmission</InputLabel>
+            <Select
+              id="transmission-select"
+              labelId="transmission-select-label"
+              value={car.transmission.id || carState.transmissions[0]?.id}
+              onChange={(e) => handleSelectChange(e, 'transmission', 'transmissions')}
+              label="Transmission"
+            >
+              {carState.transmissions.map((transmission) => (
+                <MenuItem key={transmission.id} value={transmission.id}>
+                  {transmission.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <Button type="submit" variant="contained" color="primary">
             Save
           </Button>
@@ -279,6 +384,6 @@ const AddNewCarModal: React.FC<AddNewCarModalProps> = ({ open, onClose }) => {
       </Box>
     </Modal>
   );
-}
+};
 
 export default AddNewCarModal;

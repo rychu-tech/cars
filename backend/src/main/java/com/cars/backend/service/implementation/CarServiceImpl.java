@@ -84,4 +84,10 @@ public class CarServiceImpl implements CarService {
         CarExcelGenerator generator = new CarExcelGenerator(carsList);
         generator.generateExcelFile(response);
     }
+
+    @Override
+    public void createCar(CarDto request) {
+        Car car = CarDto.convertToEntity(request);
+        carRepository.save(car);
+    }
 }

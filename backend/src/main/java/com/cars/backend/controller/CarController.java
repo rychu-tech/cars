@@ -24,7 +24,7 @@ public class CarController {
     @Autowired
     private CarService carService;
 
-    @PostMapping
+    @PostMapping("/view")
     Page<CarDto> getAllCars(@RequestBody ListRequest request) {
         return carService.getAllCars(request);
     }
@@ -50,6 +50,16 @@ public class CarController {
     @GetMapping("/excel")
     public void exportCarsToExcel(HttpServletResponse response) throws IOException {
         carService.exportCarsToExcel(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createCar(@RequestBody CarDto request) {
+        try {
+            carService.createCar(request);
+            return ResponseEntity.ok("Successfully created car!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error creating car: " + e.getMessage());
+        }
     }
 
 }

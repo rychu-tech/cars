@@ -49,7 +49,7 @@ export const getCars = createAsyncThunk(
     'cars/getAll',
     async (request: GetCarsRequest, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post('/cars', request);
+            const response = await axiosInstance.post('/cars/view', request);
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response.data || error.message);
