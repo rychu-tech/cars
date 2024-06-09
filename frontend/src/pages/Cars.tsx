@@ -20,7 +20,7 @@ import RestoreCarModal from '../components/RestoreCarModal';
 import ViewCarModal from '../components/ViewCarModal';
 import { toast } from 'react-toastify';
 import { saveAs } from 'file-saver';
-import { Button } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
 import AddNewCarModal from '../components/AddNewCarModal';
 
 const Cars: React.FC = () => {
@@ -195,7 +195,6 @@ const Cars: React.FC = () => {
           >
             Download
           </LoadingButton>
-          
         </div>
         <div className="flex-grow overflow-auto">
           <table className="table-fixed w-full bg-white border border-gray-200">
@@ -241,11 +240,19 @@ const Cars: React.FC = () => {
                   <td className="py-2 px-4 border-b text-center">{car.price}</td>
                   <td className="py-2 px-4 border-b text-center">
                     <div className="flex justify-center items-center space-x-2 cursor-pointer">
-                      <RemoveRedEyeIcon fontSize='small' onClick={() => handleViewClick(car)} />
-                      <EditIcon color="primary" fontSize='small' onClick={() => handleEditClick(car)} />
+                      <Tooltip title="View">
+                        <RemoveRedEyeIcon fontSize='small' onClick={() => handleViewClick(car)} />
+                      </Tooltip>
+                      <Tooltip title="Edit">
+                        <EditIcon color="primary" fontSize='small' onClick={() => handleEditClick(car)} />
+                      </Tooltip>
                       {car.active
-                        ? <DeleteIcon color="error" fontSize='small' onClick={() => handleDeleteClick(car)} />
-                        : <RestoreFromTrashIcon color="success" fontSize='small' onClick={() => handleRestoreClick(car)} />
+                        ? <Tooltip title="Delete">
+                            <DeleteIcon color="error" fontSize='small' onClick={() => handleDeleteClick(car)} />
+                          </Tooltip>
+                        : <Tooltip title="Restore">
+                            <RestoreFromTrashIcon color="success" fontSize='small' onClick={() => handleRestoreClick(car)} />
+                          </Tooltip>
                       }
                     </div>
                   </td>
