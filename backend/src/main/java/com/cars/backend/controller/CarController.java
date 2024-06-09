@@ -62,4 +62,17 @@ public class CarController {
         }
     }
 
+    @PutMapping("/{carId}")
+    public ResponseEntity<?> editCar(@PathVariable Long carId, @RequestBody CarDto request) {
+        try {
+            Boolean saved = carService.editCar(request);
+            if (saved) {
+                return ResponseEntity.ok("Successfully edited car!");
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error editing car! Car does not exist!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error editing car: " + e.getMessage());
+        }
+    }
+
 }

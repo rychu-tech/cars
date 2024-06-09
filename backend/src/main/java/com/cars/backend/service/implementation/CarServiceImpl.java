@@ -90,4 +90,15 @@ public class CarServiceImpl implements CarService {
         Car car = CarDto.convertToEntity(request);
         carRepository.save(car);
     }
+
+    @Override
+    public Boolean editCar(CarDto request) {
+        Optional<Car> car = carRepository.findById(request.getId());
+        if (car.isPresent()) {
+            Car carEntity = CarDto.convertToEntity(request);
+            carRepository.save(carEntity);
+            return true;
+        }
+        return false;
+    }
 }

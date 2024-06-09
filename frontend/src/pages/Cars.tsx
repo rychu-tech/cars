@@ -21,7 +21,7 @@ import ViewCarModal from '../components/ViewCarModal';
 import { toast } from 'react-toastify';
 import { saveAs } from 'file-saver';
 import { Button, Tooltip } from '@mui/material';
-import AddNewCarModal from '../components/AddNewCarModal';
+import CarModal from '../components/CarModal';
 
 const Cars: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -33,24 +33,25 @@ const Cars: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [restoreModalOpen, setRestoreModalOpen] = useState<boolean>(false);
-  const [addNewCarModalOpen, setAddNewCarModalOpen] = useState<boolean>(false);
+  const [carModalOpen, setCarModalOpen] = useState<boolean>(false);
   const [viewModalOpen, setViewModalOpen] = useState<boolean>(false);
   const [carToDelete, setCarToDelete] = useState<Car | null>(null);
   const [carToRestore, setCarToRestore] = useState<Car | null>(null);
   const [carToView, setCarToView] = useState<Car | null>(null);
+  const [carToEdit, setCarToEdit] = useState<Car | undefined>(undefined);
+
+  const fetchCars = async () => {
+    setLoading(true);
+    await dispatch(getCars({
+      pageId: page,
+      numElements: pageSize,
+      sortBy: sortBy,
+      sortDirection: sortDirection,
+    })).unwrap();
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchCars = async () => {
-      setLoading(true);
-      await dispatch(getCars({
-        pageId: page,
-        numElements: pageSize,
-        sortBy: sortBy,
-        sortDirection: sortDirection,
-      })).unwrap();
-      setLoading(false);
-    };
-
     fetchCars();
   }, [dispatch, page, pageSize, sortBy, sortDirection]);
 
@@ -86,11 +87,12 @@ const Cars: React.FC = () => {
   };
 
   const handleAddClick = () => {
-    setAddNewCarModalOpen(true);
+    setCarModalOpen(true);
   }
 
   const handleEditClick = (car: Car) => {
-    console.log(`Edit car with ID: ${car.id}`);
+    setCarToEdit(car);
+    setCarModalOpen(true);
   };
 
   const handleDeleteClick = (car: Car) => {
@@ -108,12 +110,7 @@ const Cars: React.FC = () => {
     await dispatch(deleteCar(carId)).unwrap();
     setDeleteModalOpen(false);
     setCarToDelete(null);
-    dispatch(getCars({
-      pageId: page,
-      numElements: pageSize,
-      sortBy: sortBy,
-      sortDirection: sortDirection,
-    }));
+    fetchCars();
   };
 
   const cancelDelete = () => {
@@ -121,8 +118,9 @@ const Cars: React.FC = () => {
     setCarToDelete(null);
   };
 
-  const cancelAdd = () => {
-    setAddNewCarModalOpen(false);
+  const cancelCarModal = () => {
+    setCarModalOpen(false);
+    setCarToEdit(undefined);
   }
 
   const closeViewClick = () => {
@@ -135,12 +133,7 @@ const Cars: React.FC = () => {
     await dispatch(restoreCar(carId)).unwrap();
     setRestoreModalOpen(false);
     setCarToRestore(null);
-    dispatch(getCars({
-      pageId: page,
-      numElements: pageSize,
-      sortBy: sortBy,
-      sortDirection: sortDirection,
-    }));
+    fetchCars();
   };
 
   const cancelRestore = () => {
@@ -164,6 +157,7 @@ const Cars: React.FC = () => {
       setLoading(false);
     }
   };
+
   return (
     <div className="flex flex-col h-full">
       <div className="container mx-auto p-2 flex-grow flex flex-col cursor-default">
@@ -302,11 +296,12 @@ const Cars: React.FC = () => {
         car={carToView}
         onClose={closeViewClick}
       />
-      <AddNewCarModal
-        open={addNewCarModalOpen}
-        onClose={cancelAdd}
+      <CarModal
+        open={carModalOpen}
+        onClose={cancelCarModal}
+        car={carToEdit}
+        onSave={fetchCars} // Pass the callback to refresh cars
       />
-
     </div>
   );
 }

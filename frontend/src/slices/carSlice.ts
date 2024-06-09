@@ -168,6 +168,18 @@ export const createCar = createAsyncThunk(
     }
 );
 
+export const updateCar = createAsyncThunk(
+    'cars/update',
+    async (car: Car, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.put(`/cars/${car.id}`, car);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data || error.message);
+        }
+    }
+);
+
 const carSlice = createSlice({
     name: "cars",
     initialState: initialCarState,
@@ -207,6 +219,26 @@ const carSlice = createSlice({
             state.loading = false;
         })
         .addCase(restoreCar.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        })
+        .addCase(updateCar.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(updateCar.fulfilled, (state, action) => {
+            state.loading = false;
+        })
+        .addCase(updateCar.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        })
+        .addCase(createCar.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(createCar.fulfilled, (state, action) => {
+            state.loading = false;
+        })
+        .addCase(createCar.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload as string;
         })

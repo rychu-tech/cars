@@ -14,4 +14,5 @@ public interface CarService {
     void exportCarsToExcel(HttpServletResponse response) throws IOException;
 
     void createCar(CarDto request);
+    Boolean editCar(CarDto request);
 }
