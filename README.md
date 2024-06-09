@@ -10,12 +10,11 @@ Rename files '.env.example' in frontend and backend folders to '.env'.
 Fill in the values.
 Please remember to use 127.0.0.1 instead of localhost !!!
 
-Navigate to backend folder and run:
+1. Fill in all .env files (main folder, backend folder and frontend folder). Main .env should have copy pasted values from both .env files.
+
+2. Navigate to main folder and run:
 
 ` docker-compose up --build `
 
-Navigate to frontend folder and run:
-
-` npm install `
-
-` npm run start `
+3. Frontend is running on 127.0.0.1 (port 3000). Please use it instead of localhost!!!
+4. Backend is running on port 8080.
