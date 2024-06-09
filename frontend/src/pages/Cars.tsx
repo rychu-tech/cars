@@ -300,7 +300,7 @@ const Cars: React.FC = () => {
         open={carModalOpen}
         onClose={cancelCarModal}
         car={carToEdit}
-        onSave={fetchCars} // Pass the callback to refresh cars
+        onSave={fetchCars}
       />
     </div>
   );

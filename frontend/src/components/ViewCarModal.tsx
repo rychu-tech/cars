@@ -18,8 +18,6 @@ const ViewCarModal: React.FC<ViewCarModalProps> = ({ open, car, onClose }) => {
   };
 
   const handleHistoryClick = () => {
-    console.log(`Viewing history of car with ID: ${car?.id}`);
-    // You can add navigation to a history page or other logic here
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { loginUser } from '../slices/authSlice';
@@ -12,15 +12,13 @@ const Login: React.FC = () => {
     const [password, setPassword] = useState<string>("");
 
     const navigate = useNavigate();
-
     const loading = useSelector((state: RootState) => state.auth.loading);
-
     const dispatch = useDispatch<AppDispatch>();
 
     const handleLogin = () => {
         if (!login || !password) {
             toast.error("Username and password fields cannot be empty!");
-            return; 
+            return;
         }
 
         dispatch(loginUser({ login, password }))
@@ -30,10 +28,8 @@ const Login: React.FC = () => {
                     navigate('/dashboard');
                 } else {
                     toast.error("Invalid credentials!");
-
                 }
-            })
-
+            });
     }
 
     return (
@@ -43,8 +39,8 @@ const Login: React.FC = () => {
                 <form>
                     <div className="mt-4">
                         <label className="block" htmlFor="username">Username</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             placeholder="Username"
                             id="username"
                             value={login}
@@ -54,8 +50,8 @@ const Login: React.FC = () => {
                     </div>
                     <div className="mt-4">
                         <label className="block" htmlFor="password">Password</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             placeholder="Password"
                             id="password"
                             value={password}
@@ -71,11 +67,15 @@ const Login: React.FC = () => {
                             loading={loading}
                             loadingPosition="end"
                             variant="contained"
-                            >
+                        >
                             Login
                         </LoadingButton>
                     </div>
                 </form>
+                <div className="mt-4 text-center text-red-500">
+                    <p>Test Login: admin@admin.pl</p>
+                    <p>Test Password: admin</p>
+                </div>
             </div>
         </div>
     );

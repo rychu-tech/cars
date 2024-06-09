@@ -31,7 +31,7 @@ interface CarModalProps {
   open: boolean;
   onClose: () => void;
   car?: Car;
-  onSave: () => void; // New callback prop
+  onSave: () => void;
 }
 
 const initialCar: Car = {
