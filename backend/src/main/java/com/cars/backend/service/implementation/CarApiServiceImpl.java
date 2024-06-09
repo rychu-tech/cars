@@ -85,7 +85,7 @@ public class CarApiServiceImpl implements CarApiService {
             newCar.setEngine(getEngine(carApiDto.getEngine()));
             newCar.setTransmission(getTransmission(carApiDto.getTransmission()));
             newCar.setFuelType(getFuelType(carApiDto.getFuelType()));
-
+            newCar.setActive(true);
             newCars.add(newCar);
         }
 
